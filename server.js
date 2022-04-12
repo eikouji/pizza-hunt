@@ -1,23 +1,22 @@
-const router = require('express').Router();
-const {
-  getAllPizza,
-  getPizzaById,
-  createPizza,
-  updatePizza,
-  deletePizza
-} = require('../../controllers/pizza-controller');
+const express = require('express');
+const mongoose = require('mongoose');
 
-// /api/pizzas
-router
-  .route('/')
-  .get(getAllPizza)
-  .post(createPizza);
+const app = express();
+const PORT = process.env.PORT || 3001;
 
-// /api/pizzas/:id
-router
-  .route('/:id')
-  .get(getPizzaById)
-  .put(updatePizza)
-  .delete(deletePizza);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
-module.exports = router;
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/pizza-hunt', {
+  useFindAndModify: false,
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+
+// Use this to log mongo queries being executed!
+mongoose.set('debug', true);
+
+app.use(require('./routes'));
+
+app.listen(PORT, () => console.log(`🌍 Connected on localhost:${PORT}`));
